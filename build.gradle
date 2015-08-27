@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'Library'
+repositories {
+    jcenter()
+}
+
+dependencies {    
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    testCompile 'junit:junit:4.12'
+}
+
+task copyBin(type:Copy) << {
+    from "bin"
+    into "${buildDir}/bin"
+}
+//https://discuss.gradle.org/t/how-to-execute-shell-command-source-or-dot-doesnt-work-with-exec/7271/9
+task bundleInstallable(type: Exec, dependsOn:distZip, description: "packages the installable with makeself") {
+    /**
+    cp ${WORKSPACE}/stream-service/bin/setup.sh ${WORKSPACE}/stream-service/build/distributions/
+makeself.sh ${WORKSPACE}/stream-service/build/distributions/ install.sh "$JOB_NAME  $BUILD_ID" ./setup.sh
+    */
+
+    executable "sh" 
+    args "-c", "cp bin/setup.sh ${buildDir}/distributions/ && makeself.sh ${buildDir}/distributions/ ${buildDir}/install.sh 'makeself-gradle-example 001' ./setup.sh"
+    
+
+    //executable "sh"
+    //args "-c", "echo 'hello from your shell'"
+    
+    //commandLine "echo 'hello world!'"
+}
+
+/**
+task hello(type: Exec) {
+  executable "sh"
+  args "-c", "echo 'hello from your shell'"
+}
+*/
